@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "types": ["node"],
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "./dist",
+    "rootDir": ".",
+    "baseUrl": "http://localhost:9090",
+    "ignoreDeprecations": "6.0"
+  },
+  "include": ["**/*.ts", "tests/performance/config/config.js", "tests/performance/utils/http-client.js", "tests/performance/services/auth.service.js", "tests/performance/scenarios/login.scenario.js"],
+  "exclude": ["node_modules", "dist"]
+}
