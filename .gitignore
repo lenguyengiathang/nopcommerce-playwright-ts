@@ -6,4 +6,8 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+storageState.json
+.DS_Store
+/dist/
 .env
+/junit-results.xml
