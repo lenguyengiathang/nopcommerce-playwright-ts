@@ -1,0 +1,29 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    platform: linux/amd64
+    container_name: nop_db
+    environment:
+      SA_PASSWORD: "Password123!"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - db_data:/var/opt/mssql
+    restart: unless-stopped
+
+  nop:
+    image: nopcommerceteam/nopcommerce:latest
+    platform: linux/amd64
+    container_name: nop_web
+    depends_on:
+      - db
+    ports:
+      - "9090:80"
+    volumes:
+      - nop_data:/app/App_Data
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  nop_data:
