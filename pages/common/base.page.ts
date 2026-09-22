@@ -1,4 +1,5 @@
 import { Page, Locator, expect } from "@playwright/test";
+import type { ProductListPage } from "../admin/product-list.page";
 import { HomePage } from "../user/home.page";
 import { DashboardPage } from "../admin/dashboard.page";
 import { RegisterPage } from "../user/register.page";
@@ -68,12 +69,17 @@ export class BasePage {
     this.dynamicSubCategoryItemByLabel = (label: string) => page.getByRole("menuitem", { name: label, exact: true });
   }
 
-  async navigateToUrl(url: string): Promise<void> {
+  async navigateToUrl(url: "/login"): Promise<LoginPage>;
+  async navigateToUrl(url: "/Admin/Product/List"): Promise<ProductListPage>;
+  async navigateToUrl(url: string): Promise<LoginPage | ProductListPage>;
+  async navigateToUrl(url: string): Promise<LoginPage | ProductListPage> {
     await this.page.goto(url);
     await this.waitForPageLoad();
     switch (url) {
       case "/login":
         return this.pm.getLoginPage();
+      case "/Admin/Product/List":
+        return this.pm.getProductListPage();
       default:
         throw new Error(`No page mapping found for URL: ${url}`);
     }
