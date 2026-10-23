@@ -8,6 +8,14 @@ pipeline {
         PLAYWRIGHT_JUNIT_OUTPUT_FILE = 'junit-results.xml'
     }
 
+    parameters {
+        choice(
+        name: 'TEST_SUITE',
+        choices: ['smoke', 'full'],
+        description: 'Select the test suite to run'
+    )
+    }
+
     options {
         disableConcurrentBuilds()
         timeout(time: 60, unit: 'MINUTES')
@@ -31,6 +39,12 @@ pipeline {
             }
         }
 
+        stage('Type check') {
+            steps {
+                sh 'npm run typecheck'
+            }
+        }
+
         stage('Install Chromium') {
             steps {
                 sh 'npx playwright install chromium'
@@ -49,8 +63,23 @@ pipeline {
                         set +x
                         cp "$TEST_ENV_FILE" .env
                         trap 'rm -f .env' EXIT
-                        npx playwright test --project=chromium --reporter=html,junit
-                    '''
+                        case "$TEST_SUITE" in
+                            smoke)
+                                mkdir -p test-results
+                                echo "artifact check" > test-results/archive-check.txt
+                                npx playwright test --project=chromium --grep "@smoke" --reporter=html,junit
+                                ;;
+                            full)
+                                mkdir -p test-results
+                                echo "artifact check" > test-results/archive-check.txt
+                                npx playwright test --project=chromium --reporter=html,junit
+                                ;;
+                            *)
+                                echo "Invalid TEST_SUITE: $TEST_SUITE"
+                                exit 1
+                                ;;
+                        esac
+                                            '''
                 }
             }
             post {
@@ -60,8 +89,8 @@ pipeline {
                         allowEmptyResults: true
                     )
                     archiveArtifacts(
-                        artifacts: 'playwright-report/**',
-                        allowEmptyArchive: true
+                    artifacts: 'playwright-report/**,test-results/**',
+                    allowEmptyArchive: true
                     )
                 }
             }
