@@ -63,6 +63,10 @@ pipeline {
                         set +x
                         cp "$TEST_ENV_FILE" .env
                         trap 'rm -f .env' EXIT
+                        echo "Selected suite: $TEST_SUITE"
+                            pwd
+                                find tests -type f
+                                npx playwright test --project=chromium --grep "@smoke" --list
                         case "$TEST_SUITE" in
                             smoke)
                                 mkdir -p test-results
