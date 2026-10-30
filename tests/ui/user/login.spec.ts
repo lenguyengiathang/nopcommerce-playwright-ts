@@ -17,21 +17,25 @@ test.describe("Login Tests", () => {
     await loginPage.fillEmailTextbox(registeredUser.email);
     await loginPage.fillPasswordTextbox("123456");
     await loginPage.clickLogInButton();
-    const message = await loginPage.getValidationSummaryErrorMessage();
-    expect(message).toContain("Login was unsuccessful. Please correct the errors and try again.");
-    expect(message).toContain("The credentials provided are incorrect");
+    await expect(loginPage.validationSummaryErrorMessage).toContainText(
+      "Login was unsuccessful. Please correct the errors and try again.",
+    );
+    await expect(loginPage.validationSummaryErrorMessage).toContainText("The credentials provided are incorrect");
   });
 
-  test("Verify that user cannot log in with an email not associated with an existing account", async ({ registeredUser }) => {
+  test("Verify that user cannot log in with an email not associated with an existing account", async ({
+    registeredUser,
+  }) => {
     await loginPage.fillEmailTextbox(`nonexistent.${registeredUser.email}`);
     await loginPage.fillPasswordTextbox(registeredUser.password);
     await loginPage.clickLogInButton();
-    const message = await loginPage.getValidationSummaryErrorMessage();
-    expect(message).toContain("Login was unsuccessful. Please correct the errors and try again.");
-    expect(message).toContain("No customer account found");
+    await expect(loginPage.validationSummaryErrorMessage).toContainText(
+      "Login was unsuccessful. Please correct the errors and try again.",
+    );
+    await expect(loginPage.validationSummaryErrorMessage).toContainText("No customer account found");
   });
 
-  test("Verify that user can log in with valid credentials", async ({ registeredUser }) => {
+  test("Verify that user can log in with valid credentials", { tag: "@smoke" }, async ({ registeredUser }) => {
     await loginPage.fillEmailTextbox(registeredUser.email);
     await loginPage.fillPasswordTextbox(registeredUser.password);
     homePage = await loginPage.clickLogInButton();
@@ -42,8 +46,10 @@ test.describe("Login Tests", () => {
     await loginPage.fillEmailTextbox(registeredUser.email);
     await loginPage.fillPasswordTextbox(registeredUser.password);
     homePage = await loginPage.clickLogInButton();
+    await expect(homePage.logOutLink).toBeVisible();
     await homePage.clickLogOutLink();
     await expect(homePage.logOutLink).not.toBeVisible();
+    await expect(homePage.logInLink).toBeVisible();
   });
 
   test("Verify that inactive user cannot log in", async ({ adminPageManager, registeredUser }) => {
@@ -58,8 +64,9 @@ test.describe("Login Tests", () => {
     await loginPage.fillEmailTextbox(registeredUser.email);
     await loginPage.fillPasswordTextbox(registeredUser.password);
     await loginPage.clickLogInButton();
-    const message = await loginPage.getValidationSummaryErrorMessage();
-    expect(message).toContain("Login was unsuccessful. Please correct the errors and try again.");
-    expect(message).toContain("Account is not active");
+    await expect(loginPage.validationSummaryErrorMessage).toContainText(
+      "Login was unsuccessful. Please correct the errors and try again.",
+    );
+    await expect(loginPage.validationSummaryErrorMessage).toContainText("Account is not active");
   });
 });
